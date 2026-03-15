@@ -1,0 +1,4 @@
+"Model","Region","Predictors","AIC","Deviance","Null_Deviance","DF_Residual","N_obs"
+"All_Year_lat","All","Year * lat",-4359.47955348924,0.000121375882386453,0.000131858962795639,358,362
+"North_Year","North","Year",-1929.1307308819,4.82262831601049e-05,4.92146733451172e-05,157,159
+"South_Year","South","Year",-1236.06160246692,3.49357957722065e-05,3.85584560887944e-05,101,103
