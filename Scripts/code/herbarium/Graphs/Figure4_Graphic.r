@@ -56,9 +56,8 @@ library(ggplot2)
 
 North <- ggplot(herb_df_North, aes(x = Year)) +
     geom_point(aes(y = MaxK3_LD, color = herb_df_North$color)) +
-    geom_smooth(aes(y = K3Q1S1964, color = "#8DD3C7"), se = FALSE,method="lm", size = 1.5) +
-    geom_smooth(aes(y = K3Q2S1964, color = "#FFFFB3"), se = FALSE,method="lm", size = 1.5,formula = y ~ poly(x, 2)) +
-    geom_smooth(aes(y=MaxK3_LD, color="darkgrey"), se=FALSE,method="lm", size=1.5, linetype="dashed",formula = y ~ poly(x, 2)) +
+    geom_smooth(aes(y = K3Q1S1964, color = "#8DD3C7"), method="lm", size = 1.5) +
+    geom_smooth(aes(y = K3Q2S1964, color = "#FFFFB3"), method="lm", size = 1.5,formula = y ~ poly(x, 2)) +
     scale_color_identity() +
     theme_light() +
     theme(
@@ -76,9 +75,8 @@ North <- ggplot(herb_df_North, aes(x = Year)) +
 
 South <- ggplot(herb_df_South, aes(x = Year)) +
     geom_point(aes(y = MaxK3_LD, color = herb_df_South$color)) +
-    geom_smooth(aes(y = K3Q1S1964, color = "#8DD3C7"), se = FALSE,method="lm", size = 1.5) +
-    geom_smooth(aes(y = K3Q2S1964, color = "#FFFFB3"), se = FALSE,method="lm", size = 1.5) +
-    geom_smooth(aes(y=MaxK3_LD, color= "darkgrey"), se=FALSE,method="lm", size=1.5, linetype="dashed") +
+    geom_smooth(aes(y = K3Q1S1964, color = "#8DD3C7"), method="lm", size = 1.5) +
+    geom_smooth(aes(y = K3Q2S1964, color = "#FFFFB3"), method="lm", size = 1.5) +
     scale_color_identity() +
     theme_light() +
     theme(
@@ -96,9 +94,8 @@ South <- ggplot(herb_df_South, aes(x = Year)) +
 
 Middle <- ggplot(herb_df_Middle, aes(x = Year)) +
     geom_point(aes(y = MaxK3_LD,color = herb_df_Middle$color)) +
-    geom_smooth(aes(y = K3Q1S1964, color = "#8DD3C7"), se = FALSE,method="lm", size = 1.5) +
-    geom_smooth(aes(y = K3Q2S1964, color = "#FFFFB3"), se = FALSE,method="lm", size = 1.5) +
-    geom_smooth(aes(y=MaxK3_LD, color="darkgrey"), se=FALSE,method="lm", size=1.5, linetype="dashed") +
+    geom_smooth(aes(y = K3Q1S1964, color = "#8DD3C7"),method="lm", size = 1.5) +
+    geom_smooth(aes(y = K3Q2S1964, color = "#FFFFB3"),method="lm", size = 1.5) +
     scale_color_identity() +
     theme_light() +
     theme(
@@ -129,7 +126,7 @@ responses <- c("MaxK3_LD", "K3Q1S1964", "K3Q2S1964")
 regions <- list(North = herb_df_North, South = herb_df_South, Middle = herb_df_Middle)
 
 model_results <- data.frame(
-  response = character(),
+  country = character(),
   region = character(),
   best_model = character(),
   linear_AIC = numeric(),
@@ -137,8 +134,12 @@ model_results <- data.frame(
   linear_p_value = numeric(),
   linear_B = numeric(),
   linear_F = numeric(),
-  quadratic_p_value = numeric(),
-  quadratic_F = numeric(),
+  linear_num_df = numeric(),
+  linear_den_df = numeric(),
+  quad_p_value = numeric(),
+  quad_F = numeric(),
+  quad_num_df = numeric(),
+  quad_den_df = numeric(),
   stringsAsFactors = FALSE
 )
 
@@ -158,6 +159,10 @@ for (resp in responses) {
       linear_F = summary(lm_linear)$fstatistic[1]
       quadratic_p_value <- summary(lm_quad)$coefficients["Year", "Pr(>|t|)"]
       quadratic_F = summary(lm_quad)$fstatistic[1]
+      linear_num_df <- summary(lm_linear)$fstatistic[2]
+linear_den_df <- summary(lm_linear)$fstatistic[3]
+quad_num_df   <- summary(lm_quad)$fstatistic[2]
+quad_den_df   <- summary(lm_quad)$fstatistic[3]
       model_results <- rbind(model_results, data.frame(
         response = resp,
         region = reg,
@@ -167,8 +172,12 @@ for (resp in responses) {
         linear_p_value = linear_p_value,
         linear_B = linear_B,
         linear_F = linear_F,
+        linear_num_df = linear_num_df,
+        linear_den_df = linear_den_df,
         quadratic_p_value = quadratic_p_value,
         quadratic_F = quadratic_F,
+        quad_num_df = quad_num_df,
+        quad_den_df = quad_den_df,
         stringsAsFactors = FALSE
       ))
     }
@@ -451,7 +460,7 @@ middle <- ggplot(results_df_long, aes(x = as.numeric(Year), y = Proportion, colo
 final_figure <- ggarrange(South, Middle, North, south, middle, north, ncol = 3, nrow = 2, labels = c("A", "B","C","D","E","F"),
                           common.legend = TRUE, legend = "bottom")
 
-ggsave("Figure4.pdf", plot = final_figure, width = 9, height = 6, units = "in")
+ggsave("Figure3.pdf", plot = final_figure, width = 9, height = 6, units = "in")
 
 # Save big dataframe 
 results_df$Region <- "Middle"
@@ -506,8 +515,12 @@ model_results <- data.frame(
   linear_p_value = numeric(),
   linear_B = numeric(),
   linear_F = numeric(),
+  linear_num_df = numeric(),
+  linear_den_df = numeric(),
   quad_p_value = numeric(),
   quad_F = numeric(),
+  quad_num_df = numeric(),
+  quad_den_df = numeric(),
   stringsAsFactors = FALSE
 )
 
@@ -525,8 +538,12 @@ for (country in countries) {
       linear_p <- summary(lm_linear)$coefficients["Year", "Pr(>|t|)"]
       linear_B <- summary(lm_linear)$coefficients["Year", "Estimate"]
       linear_F <- summary(lm_linear)$fstatistic[1]
+       linear_num_df <- summary(lm_linear)$fstatistic[2]
+      linear_den_df <- summary(lm_linear)$fstatistic[3]
       quad_p <- summary(lm_quad)$coefficients["I(Year^2)", "Pr(>|t|)"]
       quad_F <- summary(lm_quad)$fstatistic[1]
+      quad_num_df <- summary(lm_quad)$fstatistic[2]
+      quad_den_df <- summary(lm_quad)$fstatistic[3]
       best_model <- ifelse(quadratic_AIC < linear_AIC, "quadratic", "linear")
       model_results <- rbind(model_results, data.frame(
         country = country,
@@ -537,8 +554,12 @@ for (country in countries) {
         linear_p_value = linear_p,
         linear_B = linear_B,
         linear_F = linear_F,
+        linear_num_df = linear_num_df,
+        linear_den_df = linear_den_df,
         quad_p_value = quad_p,
         quad_F = quad_F,
+        quad_num_df = quad_num_df,
+        quad_den_df = quad_den_df,
         stringsAsFactors = FALSE
       ))
     }
