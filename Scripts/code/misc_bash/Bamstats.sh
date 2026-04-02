@@ -1,26 +1,19 @@
 #!/bin/sh
 
-#SBATCH --account loni_trpopgen03
-#SBATCH --partition workq
-#SBATCH --job-name bamstats
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH -t 3-00:00:00
-
 source /home/calicraw/miniconda3/etc/profile.d/conda.sh
 conda activate stats_conda
 
 # Define the directory containing the BAM files and the output CSV file
-OUTPUT_CSV="/work/calicraw/Projects/HerbariumStructure/aligned/bamstats_report/spain/SPAIN_BAM_STATS.csv"
-BAM_DIR="/work/calicraw/Projects/HerbariumStructure/aligned/processed/spain"
+OUTPUT_CSV="GLUE_BAM_STATS.csv"
+BAM_DIR="/HerbariumStructure/aligned/processed/GLUE"
 
 # Initialize the CSV file with the header
 echo "Sample,Total reads,Mapped reads,Forward strand,Reverse strand,Failed QC,Duplicates,Paired-end reads,Proper-pairs,Both pairs mapped,Read 1,Read 2,Singletons" > $OUTPUT_CSV
 
-cd /work/calicraw/Projects/HerbariumStructure/aligned
+cd /HerbariumStructure/aligned
 
 # Loop through each BAM file in the directory
-for BAM_FILE in $(cat spain_bam_list.txt); do
+for BAM_FILE in $(cat GLUE_bam_list.txt); do
     # Extract the sample name from the BAM file name
     SAMPLE_NAME=$(basename $BAM_FILE .bam)
     

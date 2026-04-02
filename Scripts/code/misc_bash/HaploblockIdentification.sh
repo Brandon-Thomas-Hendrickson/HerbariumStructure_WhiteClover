@@ -1,10 +1,4 @@
 #!/bin/bash
-#SBATCH --account loni_trpopgen03
-#SBATCH --partition checkpt
-#SBATCH --job-name Herb_BWA
-#SBATCH --nodes=1
-#SBATCH --ntasks=8
-#SBATCH -t 2-00:00:00
 
 cd /work/calicraw/Projects
 

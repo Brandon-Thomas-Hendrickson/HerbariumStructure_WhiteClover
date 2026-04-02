@@ -1,30 +1,23 @@
 #!/bin/sh
 
-#SBATCH --account loni_trpopgen03
-#SBATCH --partition workq
-#SBATCH --job-name qualistat
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH -t 3-00:00:00
-
 source /home/calicraw/miniconda3/etc/profile.d/conda.sh
 conda activate stats_conda
 
 # Define the directory containing the BAM files and the output CSV file
-OUTPUT_CSV="/work/calicraw/Projects/HerbariumStructure/aligned/qualimap_reports/herbarium/HERBARIUM_QUALI_STATS.csv"
-BAM_DIR="/work/calicraw/Projects/HerbariumStructure/aligned/processed/herbarium"
-QUALIDIR="/work/calicraw/Projects/HerbariumStructure/aligned/qualimap_reports/herbarium/qualistats_reports"
+OUTPUT_CSV="GLUE_QUALI_STATS.csv"
+BAM_DIR="/HerbariumStructure/aligned/processed/GLUE"
+QUALIDIR="/HerbariumStructure/aligned/qualimap_reports/GLUE/qualistats_reports"
 
 # Initialize the CSV file with the header
 echo "Sample,number of reads,number of mapped reads,number of supplementary alignments,number of secondary alignments,number of duplicated reads,duplication rate,mean mapping quality,GC percentage,general error rate,mean coverageData,std coverageData" > $OUTPUT_CSV
 
-cd /work/calicraw/Projects/HerbariumStructure/aligned
-ls $BAM_DIR/*.bam > herbarium_bam_list.txt
+cd /HerbariumStructure/aligned
+ls $BAM_DIR/*.bam > GLUE_bam_list.txt
 
-sed -i 's,/work/calicraw/Projects/HerbariumStructure/aligned/processed/herbarium/,,g' herbarium_bam_list.txt
+sed -i 's,/HerbariumStructure/aligned/processed/GLUE/,,g' GLUE_bam_list.txt
 
 # Loop through each BAM file in the directory
-for BAM_FILE in $(cat herbarium_bam_list.txt); do
+for BAM_FILE in $(cat GLUE_bam_list.txt); do
     # Extract the sample name from the BAM file name
     SAMPLE_NAME=$(basename $BAM_FILE .bam)
     
