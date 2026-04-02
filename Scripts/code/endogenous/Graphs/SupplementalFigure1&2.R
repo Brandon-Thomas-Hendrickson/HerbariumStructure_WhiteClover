@@ -1,31 +1,20 @@
-# Load in the herbarium data
+
 df <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv",header=TRUE)
 colnames(df)[33]<-"Latitude"
 df$Latitude <- as.numeric(df$Latitude)
 df1 <- df
 df <- df[df$H_C=="H",]
-# First, let's examine the data structure and distribution
-print("Data overview:")
+
 str(df[c("Latitude", "PC_LD2")])
 summary(df[c("Latitude", "PC_LD2")])
-
-# Check for missing values
-print("\nMissing values:")
 colSums(is.na(df[c("Latitude", "PC_LD2")]))
-
-# Remove any rows with missing values in key variables
 df_clean <- df[!is.na(df$Latitude) & !is.na(df$PC_LD2), ]
-print(paste("Observations after removing missing values:", nrow(df_clean)))
 
-# Perform logarithmic regression on Latitude and PC_LD2
 model <- lm(PC_LD2 ~ log(abs(Latitude)), data = df_clean)
-print("\nRegression model summary:")
 summary(model)
 
-# Create visualizations to understand the relationship
 library(ggplot2)
 
-# Plot 1: Scatter plot with regression line
 p1 <- ggplot(df_clean, aes(x = Latitude, y = PC_LD2)) +
   geom_point(alpha = 0.6, color = "blue") +
   geom_smooth(method = "lm", formula = y ~ log(abs(x)), color = "red") +
@@ -35,25 +24,17 @@ p1 <- ggplot(df_clean, aes(x = Latitude, y = PC_LD2)) +
 
 print(p1)
 
-# Calculate fitted values and residuals
 df_clean$fitted <- predict(model)
 df_clean$residuals <- residuals(model)
 
-# Method 1: Find the midpoint of the regression line
 lat_range <- range(df_clean$Latitude)
 lat_midpoint <- mean(lat_range)
-print(paste("\nSimple midpoint of latitude range:", round(lat_midpoint, 2)))
 
-# Method 2: Find the latitude where the regression prediction equals the mean of PC_LD2
 mean_PC_LD2 <- mean(df_clean$PC_LD2)
-# For log regression: PC_LD2 = intercept + slope * log(abs(Latitude))
-# Solve for Latitude when PC_LD2 = mean_PC_LD2
 intercept <- coef(model)[1]
 slope <- coef(model)[2]
 optimal_lat <- exp((mean_PC_LD2 - intercept) / slope)
-print(paste("Latitude where regression equals mean PC_LD2:", round(optimal_lat, 2)))
 
-# Method 3: Use changepoint detection to find natural breakpoints
 library(changepoint)
 # Sort data by latitude for changepoint analysis
 df_sorted <- df_clean[order(df_clean$Latitude), ]
@@ -61,11 +42,7 @@ cpt_analysis <- cpt.mean(df_sorted$PC_LD2, method = "PELT")
 changepoints <- cpts(cpt_analysis)
 
 if(length(changepoints) > 0) {
-  # Get the latitude values at changepoints
   changepoint_lats <- df_sorted$Latitude[changepoints]
-  print(paste("\nChangepoints detected at latitudes:", paste(round(changepoint_lats, 2), collapse = ", ")))
-  
-  # If multiple changepoints, choose the one closest to the middle
   if(length(changepoint_lats) > 1) {
     middle_idx <- which.min(abs(changepoint_lats - lat_midpoint))
     optimal_changepoint <- changepoint_lats[middle_idx]
@@ -78,33 +55,21 @@ if(length(changepoints) > 0) {
   optimal_changepoint <- optimal_lat
 }
 
-# Method 4: K-means clustering to identify natural groupings
 set.seed(123)
 kmeans_result <- kmeans(df_clean[c("Latitude", "PC_LD2")], centers = 2)
 df_clean$cluster <- kmeans_result$cluster
 
-# Find the latitude that best separates the clusters
 cluster_centers <- aggregate(Latitude ~ cluster, df_clean, mean)
 cluster_boundary <- mean(cluster_centers$Latitude)
-print(paste("\nK-means cluster boundary at latitude:", round(cluster_boundary, 2)))
 
-# Create the final north/south classification
-# Use the changepoint if available, otherwise use the regression-based method
 final_breakpoint <- if(exists("optimal_changepoint")) optimal_changepoint else optimal_lat
 
 df_clean$Region <- ifelse(df_clean$Latitude >= final_breakpoint, "North", "South")
 
-# Summary of the classification
-print(paste("\nFinal breakpoint chosen:", round(final_breakpoint, 2)))
-print("\nRegion classification summary:")
 table(df_clean$Region)
 
-# Validate the separation quality
-print("\nMean PC_LD2 by Region:")
 aggregate(PC_LD2 ~ Region, df_clean, function(x) c(mean = mean(x), sd = sd(x)))
 
-# Plot the final classification
-# Plot the final classification
 p2 <- ggplot(df_clean, aes(x = Latitude, y = PC_LD2, color = Region)) +
 geom_point(data = df_clean[df_clean$Latitude>40,], alpha = 0.7, color="blue") +
 geom_point(data = df_clean[df_clean$Latitude<35,], alpha = 0.7, color="red") +
@@ -117,47 +82,31 @@ geom_point(data = df_clean[df_clean$Latitude>=35 & df_clean$Latitude<=40,], alph
 print(p2)
 
 df_clean <- df_clean[,c("Latitude","PC_LD2","Region","Samp")]
-# Statistical test to validate the separation
+
 t_test_result <- t.test(PC_LD2 ~ Region, data = df_clean)
-print("\nT-test comparing PC_LD2 between North and South Regions:")
 print(t_test_result)
 
-# Additional analysis: Effect size (Cohen's d)
 library(effsize)
 cohen_d <- cohen.d(df_clean$PC_LD2[df_clean$Region == "North"], 
                    df_clean$PC_LD2[df_clean$Region == "South"])
-print("\nEffect size (Cohen's d):")
 print(cohen_d)
 
-# Save the results
 df_clean_with_Regions <- df_clean[c("Latitude", "PC_LD2", "Region")]
 
-# Load in the herbarium data
 df <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv",header=TRUE)
 colnames(df)[33]<-"Latitude"
 df <- df[df$H_C=="H",]
-# First, let's examine the data structure and distribution
-print("Data overview:")
+
 str(df[c("Latitude", "K3Q1S1964")])
 summary(df[c("Latitude", "K3Q1S1964")])
-
-# Check for missing values
-print("\nMissing values:")
 colSums(is.na(df[c("Latitude", "K3Q1S1964")]))
 
-# Remove any rows with missing values in key variables
 df_clean <- df[!is.na(df$Latitude) & !is.na(df$K3Q1S1964), ]
 print(paste("Observations after removing missing values:", nrow(df_clean)))
 
-# Perform logarithmic regression on Latitude and K3Q1S1964
 model <- lm(K3Q1S1964 ~ log(abs(Latitude)), data = df_clean)
-print("\nRegression model summary:")
 summary(model)
 
-# Create visualizations to understand the relationship
-library(ggplot2)
-
-# Plot 1: Scatter plot with regression line
 p1 <- ggplot(df_clean, aes(x = Latitude, y = K3Q1S1964)) +
   geom_point(alpha = 0.6, color = "blue") +
   geom_smooth(method = "lm", formula = y ~ log(abs(x)), color = "red") +
@@ -167,37 +116,24 @@ p1 <- ggplot(df_clean, aes(x = Latitude, y = K3Q1S1964)) +
 
 print(p1)
 
-# Calculate fitted values and residuals
 df_clean$fitted <- predict(model)
 df_clean$residuals <- residuals(model)
 
-# Method 1: Find the midpoint of the regression line
 lat_range <- range(df_clean$Latitude)
 lat_midpoint <- mean(lat_range)
-print(paste("\nSimple midpoint of latitude range:", round(lat_midpoint, 2)))
 
-# Method 2: Find the latitude where the regression prediction equals the mean of K3Q1S1964
 mean_K3Q1S1964 <- mean(df_clean$K3Q1S1964)
-# For log regression: K3Q1S1964 = intercept + slope * log(abs(Latitude))
-# Solve for Latitude when K3Q1S1964 = mean_K3Q1S1964
 intercept <- coef(model)[1]
 slope <- coef(model)[2]
 optimal_lat <- exp((mean_K3Q1S1964 - intercept) / slope)
-print(paste("Latitude where regression equals mean K3Q1S1964:", round(optimal_lat, 2)))
 
-# Method 3: Use changepoint detection to find natural breakpoints
 library(changepoint)
-# Sort data by latitude for changepoint analysis
 df_sorted <- df_clean[order(df_clean$Latitude), ]
 cpt_analysis <- cpt.mean(df_sorted$K3Q1S1964, method = "PELT")
 changepoints <- cpts(cpt_analysis)
 
 if(length(changepoints) > 0) {
-  # Get the latitude values at changepoints
   changepoint_lats <- df_sorted$Latitude[changepoints]
-  print(paste("\nChangepoints detected at latitudes:", paste(round(changepoint_lats, 2), collapse = ", ")))
-  
-  # If multiple changepoints, choose the one closest to the middle
   if(length(changepoint_lats) > 1) {
     middle_idx <- which.min(abs(changepoint_lats - lat_midpoint))
     optimal_changepoint <- changepoint_lats[middle_idx]
@@ -210,32 +146,21 @@ if(length(changepoints) > 0) {
   optimal_changepoint <- optimal_lat
 }
 
-# Method 4: K-means clustering to identify natural groupings
 set.seed(123)
 kmeans_result <- kmeans(df_clean[c("Latitude", "K3Q1S1964")], centers = 2)
 df_clean$cluster <- kmeans_result$cluster
 
-# Find the latitude that best separates the clusters
 cluster_centers <- aggregate(Latitude ~ cluster, df_clean, mean)
 cluster_boundary <- mean(cluster_centers$Latitude)
-print(paste("\nK-means cluster boundary at latitude:", round(cluster_boundary, 2)))
 
-# Create the final north/south classification
-# Use the changepoint if available, otherwise use the regression-based method
 final_breakpoint <- if(exists("optimal_changepoint")) optimal_changepoint else optimal_lat
 
 df_clean$Region <- ifelse(df_clean$Latitude >= final_breakpoint, "North", "South")
 
-# Summary of the classification
-print(paste("\nFinal breakpoint chosen:", round(final_breakpoint, 2)))
-print("\nRegion classification summary:")
 table(df_clean$Region)
 
-# Validate the separation quality
-print("\nMean K3Q1S1964 by Region:")
 aggregate(K3Q1S1964 ~ Region, df_clean, function(x) c(mean = mean(x), sd = sd(x)))
 
-# Plot the final classification
 kl <- ggplot(df_clean, aes(x = Latitude, y = K3Q1S1964, color = Region)) +
 geom_point(data = df_clean[df_clean$Latitude>40,], alpha = 0.7, color="blue") +
 geom_point(data = df_clean[df_clean$Latitude<35,], alpha = 0.7, color="red") +
@@ -247,22 +172,15 @@ geom_point(data = df_clean[df_clean$Latitude>=35 & df_clean$Latitude<=40,], alph
 
 print(kl)
 
-# Statistical test to validate the separation
 t_test_result <- t.test(K3Q1S1964 ~ Region, data = df_clean)
-print("\nT-test comparing K3Q1S1964 between North and South Regions:")
 print(t_test_result)
 
-# Additional analysis: Effect size (Cohen's d)
 library(effsize)
 cohen_d <- cohen.d(df_clean$K3Q1S1964[df_clean$Region == "North"], 
                    df_clean$K3Q1S1964[df_clean$Region == "South"])
-print("\nEffect size (Cohen's d):")
 print(cohen_d)
 
-# Save the results
 df_clean_with_Regions <- df_clean[c("Latitude", "K3Q1S1964", "Region")]
-
-# Calculate sliding window variance of PC_LD2 by latitude
 
 window_size <- 5
 lat_min <- min(df$Latitude, na.rm = TRUE)
@@ -310,13 +228,11 @@ for (start in window_starts) {
   count_results <- rbind(count_results, data.frame(window_start = start, window_end = end, count_in_range = count))
 }
 
-# Calculate scaling parameters
 count_range <- range(count_results$count_in_range, na.rm = TRUE)
 var_range <- range(results$pc_LD2_variance, na.rm = TRUE)
 scale_factor <- diff(count_range) / diff(var_range)
 offset <- count_range[1] - var_range[1] * scale_factor
 
-# Add scaled variance to count_results for plotting
 count_results$pc_LD2_variance_scaled <- results$pc_LD2_variance * scale_factor + offset
 
 library(ggplot2)

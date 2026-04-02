@@ -1,12 +1,8 @@
-################
-#Figure 1#######
-
-#PCA (Total)
 library(car)
-library(dplyr)  # For data manipulation
+library(dplyr) 
 library(ggplot2)
-library(ggforce)  # For confidence ellipses
-library(ggpubr)  # For arranging plots
+library(ggforce)  
+library(ggpubr)  
 pca_data <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv",header=TRUE)
 
 
@@ -18,23 +14,23 @@ pca_data_UFS <- pca_data[pca_data$Country == "UK" | pca_data$Country == "France"
 
 
 Ttotal_UFS <- ggplot(pca_data_UFS, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(size = 3, alpha = 0.5) +  # Scatter plot
-  geom_mark_ellipse(aes(fill = Country), alpha = 0.2, show.legend = FALSE) +  # Confidence ellipses
+  geom_point(size = 3, alpha = 0.5) +  
+  geom_mark_ellipse(aes(fill = Country), alpha = 0.2, show.legend = FALSE) + 
   scale_color_manual(
     values = colorBlindBlack8,
-    breaks = c("Herbarium", "France", "Spain", "UK"),  # Change order
-    labels = c("Herbarium", "France", "Spain", "UK")  # Update labels
+    breaks = c("Herbarium", "France", "Spain", "UK"), 
+    labels = c("Herbarium", "France", "Spain", "UK")  
   ) +
   scale_fill_manual(
     values = colorBlindBlack8,
-    breaks = c("Herbarium", "France", "Spain", "UK"),  # Change order
-    labels = c("Herbarium", "France", "Spain", "UK")  # Update labels
+    breaks = c("Herbarium", "France", "Spain", "UK"),  
+    labels = c("Herbarium", "France", "Spain", "UK")  
   ) +
-  labs(x = "PC1", y = "PC2") +  # Labels
+  labs(x = "PC1", y = "PC2") + 
   theme_light() +
   theme(
-    legend.position = "none",  # Hide legend from this plot
-    axis.text = element_text(size = 12)  # Increase axis title size
+    legend.position = "none",  
+    axis.text = element_text(size = 12) 
   ) +
   ylim(c(-0.08, 0.08)) +
   xlim(c(-0.04, 0.07))
@@ -42,25 +38,24 @@ Ttotal_UFS <- ggplot(pca_data_UFS, aes(x = PC_LD1, y = PC_LD2, color = Country))
 #PCA Time Panels
 min_year <- min(pca_data[!is.na(pca_data$Year), "Year"]) 
 
-# Filter the data
+
 filtered_data_T1_UFS <- pca_data_UFS %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year & Year <= min_year + 39)
     )
 
-# Filter the data
+
 filtered_data_T2_UFS <- pca_data_UFS %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year + 40 & Year <= min_year + 79)
     )
 
-# Filter the data
 filtered_data_T3_UFS <- pca_data_UFS %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year + 80 & Year <= min_year + 119)
     )
 
-# Filter the data
+
 filtered_data_T4_UFS <- pca_data_UFS %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year + 120 & Year <= min_year + 159)
@@ -69,54 +64,43 @@ filtered_data_T4_UFS <- pca_data_UFS %>%
 colorBlindBlack8 <- c("#E69F00", 
                       "#000000", "#56B4E9", "darkblue")
 
-# Plot using ggplot for filtered_data_T1_UFS
 T1_UFS <- ggplot(filtered_data_T1_UFS, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) + ggtitle("1838 - 1877") +  # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) + ggtitle("1838 - 1877") +  
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  scale_alpha_identity() +  
   theme_light() + theme(axis.text = element_blank(), legend.text = element_text(size = 16),legend.position = "none", legend.title = element_blank(),plot.title = element_text(hjust = 0.5)) + ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.07))+xlab("PC1") + ylab("PC2")
 
-# Repeat for filtered_data_T2_UFS
 T2_UFS <- ggplot(filtered_data_T2_UFS, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) + ggtitle("1878 - 1917") +  # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) + ggtitle("1878 - 1917") +  
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  scale_alpha_identity() +  
   theme_light() + theme(axis.text = element_blank(), legend.text = element_text(size = 16),legend.position = "none", legend.title = element_blank(),plot.title = element_text(hjust = 0.5)) + ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.07))+xlab("PC1") + ylab("PC2")
 
-# Repeat for filtered_data_T3_UFS
 T3_UFS <- ggplot(filtered_data_T3_UFS, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) +  ggtitle("1918 - 1957") + # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) +  ggtitle("1918 - 1957") + 
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  scale_alpha_identity() +  
   theme_light() + theme(axis.text = element_blank(), legend.text = element_text(size = 16),legend.position = "none", legend.title = element_blank(),plot.title = element_text(hjust = 0.5)) + ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.07))+xlab("PC1") + ylab("PC2")
 
-# Repeat for filtered_data_T4_UFS
 T4_UFS <- ggplot(filtered_data_T4_UFS, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) +  ggtitle("1958 - 1997") + # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) +  ggtitle("1958 - 1997") +
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) + 
+  scale_alpha_identity() +  
   theme_light() + theme(legend.position="none",axis.text = element_blank(), plot.title = element_text(hjust = 0.5),
                         legend.title = element_blank(), legend.text = element_text(size = 16)) + 
   ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.07))+xlab("PC1") + ylab("PC2")
 
 
-# PANEL A
-
-# Arrange the plots
 combined_PanelA <- ggarrange(
-    Ttotal_UFS,  # The total plot
-    ggarrange(T1_UFS, T2_UFS, T3_UFS, T4_UFS, ncol = 2, nrow = 2, common.legend = TRUE, legend = "top"),  # The four smaller plots with legend on right
-    ncol = 2,  # Two columns: one for Ttotal, one for T1-T4
-    heights = c(1, 1)  # Make Ttotal twice the height of the row with T1-T4
+    Ttotal_UFS, 
+    ggarrange(T1_UFS, T2_UFS, T3_UFS, T4_UFS, ncol = 2, nrow = 2, common.legend = TRUE, legend = "top"),
+    ncol = 2,
+    heights = c(1, 1) 
 )
-
-#CHANGE THE POSITION OF THE LEGEND TO BE TO THE RIGHT. REMOVE TITLE OF FIRST PLOT
-
-#ADMIX Native Groups
 
 library(dplyr)
 library(ggplot2)
@@ -131,10 +115,9 @@ herb_data <- herb_data %>% filter(Country %in% c("France", "UK", "Spain", "Belgi
 
 # Filter and sort the data
 filtered_data <- herb_data %>%
-  filter(H_C == "C") %>%  # Filter rows where H_C is "H"
-  arrange(Country)        # Sort by Country
+  filter(H_C == "C") %>%
+  arrange(Country)
 
-# Reshape the data for ggplot (long format)
 long_data <- filtered_data %>%
   dplyr::select(Samp, Country, K3Q1S1964_LD, K3Q2S1964_LD, K3Q3S1964_LD) %>%
   tidyr::pivot_longer(cols = starts_with("K3"), names_to = "Cluster", values_to = "Proportion") %>%
@@ -144,51 +127,36 @@ long_data <- filtered_data %>%
     Cluster == "K3Q3S1964_LD" ~ "3"
   ))
 
-# Create a custom order for Samp based on Cluster = 1 and then Cluster = 2
 custom_order <- long_data %>%
-  filter(Cluster %in% c("1", "3")) %>%  # Focus on Cluster 1 and 2
-  pivot_wider(names_from = Cluster, values_from = Proportion, values_fill = 0) %>%  # Reshape to wide format
-  arrange(Country, desc(`3`), desc(`1`)) %>%  # Sort by Country, Cluster 1, then Cluster 2
-  pull(Samp)  # Extract the ordered Samp values
+  filter(Cluster %in% c("1", "3")) %>%
+  pivot_wider(names_from = Cluster, values_from = Proportion, values_fill = 0) %>%
+  arrange(Country, desc(`3`), desc(`1`)) %>%
+  pull(Samp)
 
-# Set the desired country order
 country_order <- c("UK", "Belgium", "Sweden", "Poland", "Germany", "Greece", "France", "Spain")
 
-# Apply the order to the Country factor
 long_data <- long_data %>%
   mutate(Country = factor(Country, levels = country_order))
 
-# Apply the custom order to Samp
 long_data <- long_data %>%
-  mutate(Samp = factor(Samp, levels = custom_order))  # Convert Samp to a factor with the custom order
+  mutate(Samp = factor(Samp, levels = custom_order))
 
-# Create the NGSadmix plot with separate panels for each Country
 ngsadmix_plot <- ggplot(long_data, aes(x = Samp, y = Proportion, fill = Cluster)) +
-  geom_bar(stat = "identity", position = "stack", width = 1) +  # Ensure no space between bars
+  geom_bar(stat = "identity", position = "stack", width = 1) +
   theme_minimal() +
   theme(
     legend.position = "none",
-    axis.text.x = element_blank(),  # Hide x-axis text for clarity
+    axis.text.x = element_blank(),
     axis.ticks.x = element_blank(),
-    axis.title.x = element_blank(),  # Hide x-axis title
+    axis.title.x = element_blank(),
     axis.text.y = element_blank(),
-    axis.title.y = element_text(size=12,color="black"), # Hide x-axis ticks
-    strip.text = element_text(size = 12, face = "bold")  # Style for facet labels
+    axis.title.y = element_text(size=12,color="black"),
+    strip.text = element_text(size = 12, face = "bold")
   ) +
   scale_fill_brewer(palette = "Set3") +
-  scale_y_continuous(limits = c(0, 1.01), expand = c(0, 0)) +  # Disable axis expansion
-  facet_wrap(~ Country, nrow = 1, ncol = 4, scales = "free_x")  # Specify 4 rows and 1 column
+  scale_y_continuous(limits = c(0, 1.01), expand = c(0, 0)) +
+  facet_wrap(~ Country, nrow = 1, ncol = 4, scales = "free_x")
 
-# Display the plot
-print(ngsadmix_plot)
-
-#ADMIX Map Pies
-
-#########################
-#Pie Chart##############
-#########################
-
-#Big Map figure
 if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
 pacman::p_load(
     rworldmap,
@@ -1079,18 +1047,16 @@ create_pie_map_by_timebin <- function(data, timebin_name, title, pie_scale) {
     scale_fill_manual(values = c("#8DD3C7", "#ffffb3d7", "#BEBADA")) +
     coord_sf(xlim = c(-105, -60), ylim = c(25, 50)) +
     labs(title = title) +
-    # North arrow
     annotation_north_arrow(
-      location = "br",           # bottom-right
+      location = "br",
       which_north = "true",
       style = north_arrow_fancy_orienteering(),
       height = unit(1, "cm"),
       width = unit(1, "cm")
     ) +
-    # Scale bar
     annotation_scale(
-      location = "bl",           # bottom-left
-      width_hint = 0.3,          # fraction of plot width
+      location = "bl",
+      width_hint = 0.3,
       style = "ticks",
       text_cex = 0.8
     ) +
@@ -1106,15 +1072,14 @@ create_pie_map_by_timebin <- function(data, timebin_name, title, pie_scale) {
     )
 }
 
-# Now all pies will be the same size across all panels
 plot1_gg <- create_pie_map_by_timebin(herbgen, "1838-1877", "1838-1877", pie_scale = 0.75)
 plot2_gg <- create_pie_map_by_timebin(herbgen, "1878-1917", "1878-1917", pie_scale = 0.75)
 plot3_gg <- create_pie_map_by_timebin(herbgen, "1918-1957", "1918-1957", pie_scale = 0.75)
 plot4_gg <- create_pie_map_by_timebin(herbgen, "1958-1997", "1958-1997", pie_scale = 0.75)
-# Combine plots into a single figure
+
 mapseries_plot <- ggarrange(plot1_gg, plot2_gg, plot3_gg, plot4_gg,
           ncol = 2, nrow = 2)
-#Panel B
+
 combined_PanelB <- ggarrange(ngsadmix_plot,mapseries_plot,
           ncol = 2, nrow = 1, widths = c(1,3))
 
@@ -1123,26 +1088,19 @@ combined_PanelB <- ggarrange(ngsadmix_plot,mapseries_plot,
 
 herb_df <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv",header=TRUE)
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1838-1877" | df$H_C=="C",]
-library(dplyr)
-
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_1 <- centroids %>%
     rowwise() %>%
     mutate(
@@ -1155,26 +1113,20 @@ results_N_1 <- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1878-1917" | df$H_C=="C",]
-library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_2<- centroids %>%
     rowwise() %>%
     mutate(
@@ -1187,26 +1139,20 @@ results_N_2<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1918-1957" | df$H_C=="C",]
-library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_3<- centroids %>%
     rowwise() %>%
     mutate(
@@ -1219,26 +1165,21 @@ results_N_3<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1958-1997" | df$H_C=="C",]
-library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
+
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_4<- centroids %>%
     rowwise() %>%
     mutate(
@@ -1251,26 +1192,20 @@ results_N_4<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1838-1877" | df$H_C=="C",]
-library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_1 <- centroids %>%
     rowwise() %>%
     mutate(
@@ -1283,26 +1218,20 @@ results_S_1 <- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1878-1917" | df$H_C=="C",]
-library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_2<- centroids %>%
     rowwise() %>%
     mutate(
@@ -1315,26 +1244,21 @@ results_S_2<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1918-1957" | df$H_C=="C",]
-library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
+
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_3<- centroids %>%
     rowwise() %>%
     mutate(
@@ -1347,26 +1271,21 @@ results_S_3<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1958-1997" | df$H_C=="C",]
-library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
+
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_4<- centroids %>%
     rowwise() %>%
     mutate(
@@ -1397,10 +1316,8 @@ results_S_4$Region <- "South"
 
 results <- rbind(results_N_1, results_N_2, results_N_3, results_N_4, results_S_1, results_S_2, results_S_3, results_S_4)
 
-# Middle region analysis for each TimeBin
 pc_cols <- c("PC_LD1","PC_LD2")
 
-# 1838-1877
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1838-1877" | df$H_C=="C",]
 centroids <- df %>%
@@ -1419,7 +1336,6 @@ results_M_1 <- centroids %>%
     ) %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
-# 1878-1917
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1878-1917" | df$H_C=="C",]
 centroids <- df %>%
@@ -1438,7 +1354,6 @@ results_M_2 <- centroids %>%
     ) %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
-# 1918-1957
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1918-1957" | df$H_C=="C",]
 centroids <- df %>%
@@ -1457,7 +1372,6 @@ results_M_3 <- centroids %>%
     ) %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
-# 1958-1997
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1958-1997" | df$H_C=="C",]
 centroids <- df %>%
@@ -1476,7 +1390,6 @@ results_M_4 <- centroids %>%
     ) %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
-# Add TimeBin and Region columns
 results_M_1$TimeBin <- "1838-1877"
 results_M_2$TimeBin <- "1878-1917"
 results_M_3$TimeBin <- "1918-1957"
@@ -1486,14 +1399,11 @@ results_M_2$Region <- "Middle"
 results_M_3$Region <- "Middle"
 results_M_4$Region <- "Middle"
 
-# Combine with previous results
 results <- rbind(results, results_M_1, results_M_2, results_M_3, results_M_4)
 results_UFS <- results[results$Country=="UK" | results$Country=="France" | results$Country=="Spain",]
-library(ggplot2)
 
 colorBlindBlack8 <- c("#E69F00", "#56B4E9", "darkblue")
 
-# Custom labels for Region
 region_labels <- c("North" = "North: > 40°N", "Middle" = "Middle: 35°N - 40°N", "South" = "South: < 35°N")
 results_UFS$Region <- factor(results_UFS$Region, levels = c("South", "Middle", "North"))
 
@@ -1513,11 +1423,7 @@ combined_PanelC <- ggplot(results_UFS, aes(x = TimeBin, y = avg_distance, color 
     axis.text.x = element_text(size = 8),
     axis.title.y = element_text(size = 12),
     axis.title.x=element_blank(),
-    #legend.title = element_blank(),
-    #legend.text = element_text(size = 12),
-    legend.position="none",
-    #legend.background = element_rect(fill = "white", color = "black", size = 0.5, linetype = "solid"), # Box for legend
-    #legend.box.margin = margin(4, 4, 4, 4) # Optional: margin inside the box
+    legend.position="none"
   ) +
   labs(
     y = "Average Distance"
@@ -1534,7 +1440,6 @@ figure2 <- ggarrange(ngsadmix_plot,mapseries_plot,
 ggsave("Figure2.pdf", plot = figure1, width = 9, height = 6, units = "in")
 ggsave("Figure3.pdf", plot = figure2, width = 6, height = 6, units = "in")
 
-# Figure C Analysis
 library(dplyr)
 library(emmeans)
 library(multcomp)
@@ -1542,43 +1447,36 @@ library(multcomp)
 herb_df <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv", header = TRUE)
 pc_cols <- c("PC_LD1", "PC_LD2")
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# ========== CREATE RAW DISTANCE DATA ==========
 
 regions <- c("North", "Middle", "South")
 timebins <- c("1838-1877", "1878-1917", "1918-1957", "1958-1997")
 
-# Initialize empty list to store all distance data
 all_distances <- list()
 
 for (region in regions) {
   for (timebin in timebins) {
-    # Filter data for this region and timebin
     df <- herb_df[herb_df$Region == region | herb_df$H_C == "C", ]
     df <- df[df$TimeBin == timebin | df$H_C == "C", ]
     
-    # Calculate centroids for each country except USA
     centroids <- df %>%
       filter(Country != "USA") %>%
       group_by(Country) %>%
       summarise(across(all_of(pc_cols), mean), .groups = "drop")
     
-    # Get USA samples
+    
     usa_samples <- df %>%
       filter(Country == "USA") %>%
       dplyr::select(all_of(pc_cols))
-    
-    # Skip if no USA samples
+
     if (nrow(usa_samples) == 0) next
     
-    # For each centroid, calculate distances to ALL USA samples individually
+   individually
     for (i in 1:nrow(centroids)) {
       country_name <- centroids$Country[i]
       centroid_coords <- as.numeric(centroids[i, pc_cols])
-      
-      # Calculate distance from this centroid to each USA sample
+
       for (j in 1:nrow(usa_samples)) {
         usa_coords <- as.numeric(usa_samples[j, pc_cols])
         dist <- euclidean(centroid_coords, usa_coords)
@@ -1596,24 +1494,17 @@ for (region in regions) {
   }
 }
 
-# Combine all individual distances into one dataframe
 results_UFS_raw <- bind_rows(all_distances)
 
-# Filter to only UK, France, Spain
 results_UFS_raw <- results_UFS_raw %>%
   filter(Country %in% c("UK", "France", "Spain"))
 
-# ========== NOW RUN STATISTICAL MODELS ==========
-
-# Prepare data
 results_UFS_raw <- results_UFS_raw %>%
   mutate(
     TimeBin = factor(TimeBin, levels = c("1838-1877", "1958-1997")),
     Region = factor(Region, levels = c("North", "Middle", "South")),
     Country = factor(Country)
   )
-
-# ========== ANALYZE EACH COUNTRY-REGION COMBINATION ==========
 
 countries <- c("UK", "France", "Spain")
 regions <- c("North", "Middle", "South")
@@ -1625,46 +1516,35 @@ all_cld <- list()
 
 for (country in countries) {
   for (region in regions) {
-    cat("\n========================================\n")
-    cat("ANALYZING:", country, "-", region, "\n")
-    cat("========================================\n\n")
-    
-    # Subset data for this country-region combination
     subset_data <- results_UFS_raw %>% 
       filter(Country == country, Region == region)
-    
-    # Skip if no data
+
     if (nrow(subset_data) == 0) {
       cat("No data available. Skipping.\n\n")
       next
     }
-    
-    # Fit model: distance ~ TimeBin
+
     model <- lm(distance ~ TimeBin, data = subset_data)
     all_models[[paste0(country, "_", region)]] <- model
-    
-    # Model summary
+
     cat("Model Summary:\n")
     print(summary(model))
     cat("\n")
-    
-    # Emmeans by TimeBin
+
     emm_timebin <- emmeans(model, ~ TimeBin)
     all_emmeans[[paste0(country, "_", region, "_TimeBin")]] <- emm_timebin
     
     cat("Estimated Marginal Means by TimeBin:\n")
     print(emm_timebin)
     cat("\n")
-    
-    # Pairwise comparisons with Tukey adjustment
+
     pairs_timebin <- pairs(emm_timebin, adjust = "tukey")
     all_pairs[[paste0(country, "_", region, "_TimeBin")]] <- pairs_timebin
     
     cat("Pairwise Comparisons (TimeBin):\n")
     print(pairs_timebin)
     cat("\n")
-    
-    # Compact Letter Display
+
     cld_timebin <- cld(emm_timebin, Letters = letters, adjust = "tukey")
     all_cld[[paste0(country, "_", region, "_TimeBin")]] <- cld_timebin
     
@@ -1674,40 +1554,29 @@ for (country in countries) {
   }
 }
 
-# ========== CREATE SUMMARY DATAFRAME OF ALL RESULTS ==========
-
-# Initialize empty list to store results
 results_list <- list()
 
 for (country in countries) {
   for (region in regions) {
     key <- paste0(country, "_", region, "_TimeBin")
-    
-    # Skip if no results for this combination
+
     if (!key %in% names(all_emmeans)) next
-    
-    # Extract emmeans
+
     emm_df <- as.data.frame(all_emmeans[[key]])
-    
-    # Extract pairwise comparisons
+
     pairs_df <- as.data.frame(all_pairs[[key]])
-    
-    # Extract compact letter display
+
     cld_df <- as.data.frame(all_cld[[key]])
-    
-    # Add Country and Region columns to emmeans
+
     emm_df$Country <- country
     emm_df$Region <- region
-    
-    # Add Country and Region columns to pairwise comparisons
+
     pairs_df$Country <- country
     pairs_df$Region <- region
-    
-    # Add Country and Region columns to CLD
+
     cld_df$Country <- country
     cld_df$Region <- region
-    
-    # Store in list
+
     results_list[[paste0(country, "_", region)]] <- list(
       emmeans = emm_df,
       pairs = pairs_df,
@@ -1716,16 +1585,12 @@ for (country in countries) {
   }
 }
 
-# Combine all emmeans into one dataframe
 all_emmeans_df <- bind_rows(lapply(results_list, function(x) x$emmeans))
 
-# Combine all pairwise comparisons into one dataframe
 all_pairs_df <- bind_rows(lapply(results_list, function(x) x$pairs))
 
-# Combine all CLDs into one dataframe
 all_cld_df <- bind_rows(lapply(results_list, function(x) x$cld))
 
-# Reorder columns for better readability
 all_emmeans_df <- all_emmeans_df %>%
   dplyr::select(Country, Region, TimeBin, emmean, SE, df, lower.CL, upper.CL)
 

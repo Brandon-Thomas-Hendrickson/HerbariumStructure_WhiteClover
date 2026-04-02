@@ -1,10 +1,6 @@
 library(dplyr)
-
-# Calculate 10-year rolling averages for each region and country combination
-library(dplyr)
 library(purrr)
 
-# Function to compute rolling mean over a time window
 rolling_mean_year <- function(years, values, window = 10) {
   map_dbl(seq_along(years), function(i) {
     in_window <- years >= (years[i] - window + 1) & years <= years[i]
@@ -23,7 +19,6 @@ herb_rolling <- herb_save |>
   ) |>
   ungroup()
 
-# Now extract min/max year values using the rolling averages
 nmax <- herb_rolling |>
   filter(Region == "North", Year == max(Year[Region == "North"])) |>
   summarise(sum = Belgium_10yr + UK_10yr) |>
@@ -34,7 +29,6 @@ nmin <- herb_rolling |>
   summarise(sum = Belgium_10yr + UK_10yr) |>
   pull(sum)
 
-# Repeat pattern for middle and south regions
 mmax <- herb_rolling |>
   filter(Region == "Middle", Year == max(Year[Region == "Middle"])) |>
   summarise(sum = France_10yr + Spain_10yr) |>
@@ -45,7 +39,6 @@ mmin <- herb_rolling |>
   summarise(sum = France_10yr + Spain_10yr) |>
   pull(sum)
 
-# Repeat pattern for middle and south regions
 mUKmax <- herb_rolling |>
   filter(Region == "Middle", Year == max(Year[Region == "Middle"])) |>
   summarise(sum = UK_10yr + Belgium_10yr) |>
@@ -56,7 +49,6 @@ mUKmin <- herb_rolling |>
   summarise(sum = UK_10yr + Belgium_10yr) |>
   pull(sum)
 
-# Repeat pattern for South and south regions
 smax <- herb_rolling |>
   filter(Region == "South", Year == max(Year[Region == "South"])) |>
   summarise(sum = France_10yr + Spain_10yr) |>
@@ -67,7 +59,6 @@ smin <- herb_rolling |>
   summarise(sum = France_10yr + Spain_10yr) |>
   pull(sum)
 
-# Repeat pattern for South and south regions
 sUKmax <- herb_rolling |>
   filter(Region == "South", Year == max(Year[Region == "South"])) |>
   summarise(sum = UK_10yr + Belgium_10yr) |>

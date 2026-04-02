@@ -146,7 +146,6 @@ model_results <- data.frame(
 for (resp in responses) {
   for (reg in names(regions)) {
     df <- regions[[reg]]
-    # Remove rows with NA in response or Year
     df <- df[!is.na(df[[resp]]) & !is.na(df$Year), ]
     if (nrow(df) > 2) {
       lm_linear <- lm(as.formula(paste(resp, "~ Year")), data = df)
@@ -189,15 +188,11 @@ print(model_results)
 #########DAPC Analysis######################
 ###########################################
 
-# Install and load the adegenet package
 if (!requireNamespace("adegenet", quietly = TRUE)) {
   install.packages("adegenet")
 }
 library(adegenet)
 
-
-# Load your .cov file
-# Replace 'herb_GLUE_SPAIN_filtered_MAF05.cov' with the path to your file
 cov_data <- read.table("Data/herbarium/Input/herb_GLUE_SPAIN_filtered_LD_MAF05.cov", header = FALSE)
 
 group_data <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv")
@@ -205,57 +200,41 @@ order <- read.csv("Data/herbarium/Input/order_files.csv")
 group_data <- group_data[match(order$Samp, group_data$Samp), ]
 grp <- factor(group_data$PcoaYR) 
 
-# Define the range of years
 years <- 1900:1997
 
-# Initialize an empty list to store results
 results_list <- list()
 
-# Loop through each year
 for (year in years) {
-  # Define the herbarium block for the current year
-herbarium_block <- paste0(year, "_South")  # Adjust this if your group labels differ
+herbarium_block <- paste0(year, "_South")
 selected_groups <- c("Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece",herbarium_block)
 filtered_indices <- grp %in% selected_groups
 cov_data_filtered <- cov_data[filtered_indices, filtered_indices]
 grp_filtered <- droplevels(grp[filtered_indices])
 
-# Perform DAPC analysis
 dapc_result <- dapc(cov_data_filtered, grp = grp_filtered, n.pca = 2, n.da = 2)
-  
-  # Check if the current year exists in the filtered groups
+
   if (herbarium_block %in% levels(grp_filtered)) {
-    # Extract indices for the current herbarium block
     herbarium_indices <- which(grp_filtered == herbarium_block)
     herbarium_contributions <- dapc_result$posterior[herbarium_indices, , drop = FALSE]
-    
-    # Subset to only Spain, UK, and France
+
     herbarium_contributions_subset <- herbarium_contributions[, c("Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece"), drop = FALSE]
-    
-    # Normalize the contributions so they sum to 1
+
     herbarium_contributions_normalized <- sweep(herbarium_contributions_subset, 1, rowSums(herbarium_contributions_subset), "/")
-    
-    # Calculate mean contribution of Spain, UK, and France
+
     mean_contributions <- colMeans(herbarium_contributions_normalized)
-    
-    # Add the results to the list
+
     results_list[[as.character(year)]] <- c(Year = year, mean_contributions)
   }
 }
 
-# Combine the results into a dataframe
 results_df_south <- do.call(rbind, results_list)
-
-# Convert to a dataframe and set column names
 results_df_south <- as.data.frame(results_df_south)
 colnames(results_df_south) <- c("Year", "Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece")
 
-# Print the dataframe
 print(results_df_south)
 
 colorBlindBlack8 <- c("#F0E442", "#E69F00", "#D55E00", "#009E73", "#0072B2", "#56B4E9", "#CC79A7", "darkblue", "#000000")
 
-# Reshape results_df to long format
 library(tidyr)
 results_df_S_long <- results_df_south %>%
   pivot_longer(cols = c("Belgium", "Spain", "UK", "France", "Poland", "Germany", "Sweden", "Greece"),
@@ -272,8 +251,8 @@ geom_point(size = 1.5)+
     axis.title.y = element_text(size = 12, color = "black"),
     axis.text = element_text(size = 12, color = "black"),
     axis.ticks.x = element_blank(),
-      legend.text = element_text(size = 16),   # Make legend text larger
-  legend.title = element_blank(),          # Remove legend title
+      legend.text = element_text(size = 16), 
+  legend.title = element_blank(),
   legend.position = "null"
   )
 
@@ -283,75 +262,56 @@ order <- read.csv("Data/herbarium/Input/order_files.csv")
 group_data <- group_data[match(order$Samp, group_data$Samp), ]
 grp <- factor(group_data$PcoaYR) 
 
-
-# Define the range of years
 years <- 1838:1997
-
-# Initialize an empty list to store results
 results_list <- list()
 
-# Loop through each year
 for (year in years) {
-  # Define the herbarium block for the current year
-herbarium_block <- paste0(year, "_North")  # Adjust this if your group labels differ
+herbarium_block <- paste0(year, "_North")
 selected_groups <- c("Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece",herbarium_block)
 filtered_indices <- grp %in% selected_groups
 cov_data_filtered <- cov_data[filtered_indices, filtered_indices]
 grp_filtered <- droplevels(grp[filtered_indices])
 
-# Perform DAPC analysis
 dapc_result <- dapc(cov_data_filtered, grp = grp_filtered, n.pca = 2, n.da = 2)
   
-  # Check if the current year exists in the filtered groups
   if (herbarium_block %in% levels(grp_filtered)) {
-    # Extract indices for the current herbarium block
     herbarium_indices <- which(grp_filtered == herbarium_block)
     herbarium_contributions <- dapc_result$posterior[herbarium_indices, , drop = FALSE]
-    
-    # Subset to only Spain, UK, and France
     herbarium_contributions_subset <- herbarium_contributions[, c("Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece"), drop = FALSE]
     
-    # Normalize the contributions so they sum to 1
     herbarium_contributions_normalized <- sweep(herbarium_contributions_subset, 1, rowSums(herbarium_contributions_subset), "/")
-    
-    # Calculate mean contribution of Spain, UK, and France
     mean_contributions <- colMeans(herbarium_contributions_normalized)
-    
-    # Add the results to the list
     results_list[[as.character(year)]] <- c(Year = year, mean_contributions)
   }
 }
 
-# Combine the results into a dataframe
 results_df_N <- do.call(rbind, results_list)
 
-# Convert to a dataframe and set column names
 results_df_N <- as.data.frame(results_df_N)
 colnames(results_df_N) <- c("Year", "Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece")
 
 colorBlindBlack8 <- c("#F0E442", "#E69F00", "#D55E00", "#009E73", "#0072B2", "#56B4E9", "#CC79A7", "darkblue", "#000000")
 
-# Reshape results_df to long format
 library(tidyr)
 results_df_N_long <- results_df_N %>%
   pivot_longer(cols = c("Belgium", "Spain", "UK", "France", "Poland", "Germany", "Sweden", "Greece"),
                names_to = "Country", values_to = "Proportion")
 
 north <- ggplot(results_df_N_long, aes(x = as.numeric(Year), y = Proportion, color = Country)) +
-  geom_point(size = 1.5) + # Ensures legend is correct
-  # Belgium (quadratic)
+  geom_point(size = 1.5) + 
+  
   geom_smooth(
     data = subset(results_df_N_long, Country == "Belgium"),
     aes(color = Country),
     se = FALSE, method = "lm", formula = y ~ poly(x, 2), size = 1.5
   ) +
-  # UK (quadratic)
+ 
   geom_smooth(
     data = subset(results_df_N_long, Country == "UK"),
     aes(color = Country),
     se = FALSE, method = "lm", formula = y ~ poly(x, 2), size = 1.5
   ) +
-  # All others (linear)
+
   geom_smooth(
     data = subset(results_df_N_long, !(Country %in% c("Belgium", "UK"))),
     aes(color = Country),
@@ -372,73 +332,54 @@ north <- ggplot(results_df_N_long, aes(x = as.numeric(Year), y = Proportion, col
 
 library(ggpubr)
 
-# Mid Atlantic
 group_data <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv")
 order <- read.csv("Data/herbarium/Input/order_files.csv")
 group_data <- group_data[match(order$Samp, group_data$Samp), ]
 grp <- factor(group_data$PcoaYR) 
 
-# Define the range of years
 years <- 1838:1997
-
-# Initialize an empty list to store results
 results_list <- list()
 
-# Loop through each year
 for (year in years) {
-  # Define the herbarium block for the current year
-herbarium_block <- paste0(year, "_Middle")  # Adjust this if your group labels differ
+herbarium_block <- paste0(year, "_Middle")
 selected_groups <- c("Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece",herbarium_block)
 filtered_indices <- grp %in% selected_groups
 cov_data_filtered <- cov_data[filtered_indices, filtered_indices]
 grp_filtered <- droplevels(grp[filtered_indices])
 
-# Perform DAPC analysis
 dapc_result <- dapc(cov_data_filtered, grp = grp_filtered, n.pca = 2, n.da = 2)
   
-  # Check if the current year exists in the filtered groups
   if (herbarium_block %in% levels(grp_filtered)) {
-    # Extract indices for the current herbarium block
     herbarium_indices <- which(grp_filtered == herbarium_block)
     herbarium_contributions <- dapc_result$posterior[herbarium_indices, , drop = FALSE]
-    
-    # Subset to only Spain, UK, and France
     herbarium_contributions_subset <- herbarium_contributions[, c("Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece"), drop = FALSE]
     
-    # Normalize the contributions so they sum to 1
     herbarium_contributions_normalized <- sweep(herbarium_contributions_subset, 1, rowSums(herbarium_contributions_subset), "/")
-    
-    # Calculate mean contribution of Spain, UK, and France
     mean_contributions <- colMeans(herbarium_contributions_normalized)
-    
-    # Add the results to the list
     results_list[[as.character(year)]] <- c(Year = year, mean_contributions)
   }
 }
 
-# Combine the results into a dataframe
 results_df <- do.call(rbind, results_list)
 
-# Convert to a dataframe and set column names
 results_df <- as.data.frame(results_df)
 colnames(results_df) <- c("Year", "Spain", "UK", "France", "Poland","Belgium","Germany","Sweden", "Greece")
 
 colorBlindBlack8 <- c("#F0E442", "#E69F00", "#D55E00", "#009E73", "#0072B2", "#56B4E9", "#CC79A7", "darkblue", "#000000")
 
-# Reshape results_df to long format
 library(tidyr)
 results_df_long <- results_df %>%
   pivot_longer(cols = c("Belgium", "Spain", "UK", "France", "Poland", "Germany", "Sweden", "Greece"),
                names_to = "Country", values_to = "Proportion")
 
 middle <- ggplot(results_df_long, aes(x = as.numeric(Year), y = Proportion, color = Country)) +
-  geom_point(size = 1.5) + # Ensures legend is correct
+  geom_point(size = 1.5) + 
   geom_smooth(
     data = subset(results_df_long, Country == "UK"),
     aes(color = Country),
     se = FALSE, method = "lm", formula = y ~ poly(x, 2), size = 1.5
   ) +
-  # All others (linear)
+
   geom_smooth(
     data = subset(results_df_long, !(Country %in% c("UK"))),
     aes(color = Country),
@@ -467,10 +408,7 @@ results_df$Region <- "Middle"
 results_df_N$Region <- "North"
 results_df_south$Region <- "South"
 herb_save <- rbind(results_df_N,results_df_south,results_df)
-###########################################
-#########Combine Panels######################
 
-#Model Summaries for each Country
 model_south_spain <- lm(Spain ~ Year, data = results_df_south)
 summary(model_south_spain)
 model_south_uk <- lm(UK ~ Year, data = results_df_south)
@@ -527,7 +465,6 @@ model_results <- data.frame(
 for (country in countries) {
   for (reg in names(regions)) {
     df <- regions[[reg]]
-    # Remove rows with NA in country or Year
     df <- df[!is.na(df[[country]]) & !is.na(df$Year), ]
     if (nrow(df) > 2) {
       lm_linear <- lm(as.formula(paste(country, "~ Year")), data = df)

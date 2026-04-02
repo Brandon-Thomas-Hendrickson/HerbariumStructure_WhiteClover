@@ -1,11 +1,10 @@
 
 library(car)
-library(dplyr)  # For data manipulation
+library(dplyr)
 library(ggplot2)
-library(ggforce)  # For confidence ellipses
+library(ggforce)
 
-# Load the covariance matrix
-cov_file <- "Data/herbarium/Input/herb_GLUE_SPAIN_filtered_LD_MAF05.cov"  # Replace with your .cov file path
+cov_file <- "Data/herbarium/Input/herb_GLUE_SPAIN_filtered_LD_MAF05.cov" 
 pca_data <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv",header=TRUE)
 herb_EUR_list <- pca_data
 
@@ -19,117 +18,99 @@ pca_data$Sample <- herb_EUR_list$Sample
 
 colorBlindBlack8 <- c("#F0E442", "#E69F00", "#D55E00", "#009E73", "#0072B2", "#56B4E9", "#CC79A7", "darkblue", "#000000")
 
-# Plot using ggplot for Ttotal
 Ttotal <- ggplot(pca_data, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
   geom_point(size = 3, alpha = 0.8) +  # Scatter plot
-  geom_mark_ellipse(aes(fill = Country), alpha = 0.2, show.legend = FALSE) +  # Confidence ellipses
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  labs(x = "PC_LD1", y = "PC_LD2") +  # Labels
+  geom_mark_ellipse(aes(fill = Country), alpha = 0.2, show.legend = FALSE) +  
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  labs(x = "PC_LD1", y = "PC_LD2") +  
   theme_light() +
   theme(
-    legend.text = element_text(size = 12),legend.title = element_blank()  # Increase legend text size
+    legend.text = element_text(size = 12),legend.title = element_blank()  
   ) +
   ylim(c(-0.08, 0.08)) +
   xlim(c(-0.08, 0.07))
 
-min_year <- min(pca_data[!is.na(pca_data$Year), "Year"])  # Get the minimum year from the data
+min_year <- min(pca_data[!is.na(pca_data$Year), "Year"])  
 
-# Filter the data
 filtered_data_T1 <- pca_data %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year & Year <= min_year + 39)
     )
 
-# Filter the data
 filtered_data_T2 <- pca_data %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year + 40 & Year <= min_year + 79)
     )
 
-# Filter the data
 filtered_data_T3 <- pca_data %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year + 80 & Year <= min_year + 119)
     )
 
-# Filter the data
 filtered_data_T4 <- pca_data %>%
     filter(
         (H_C == "C") | (H_C == "H" & Year >= min_year + 120 & Year <= min_year + 159)
     )
 
 
-# Plot using ggplot for filtered_data_T1
 T1 <- ggplot(filtered_data_T1, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) +  # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) +  
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  scale_alpha_identity() +  
   theme_light() + ggtitle("1838-1877")+theme(legend.position = "none",axis.text=element_blank(),axis.title=element_blank()) + ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.06))
 
-# Repeat for filtered_data_T2
 T2 <- ggplot(filtered_data_T2, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) +  # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) +  
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  scale_alpha_identity() +  
   theme_light() + ggtitle("1878-1917")+theme(legend.position = "none", plot.title = element_text(hjust = 0.5),axis.text=element_blank(),axis.title=element_blank()) + ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.06))
 
-# Repeat for filtered_data_T3
 T3 <- ggplot(filtered_data_T3, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) +  # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) +  
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  scale_alpha_identity() +  
   theme_light() + ggtitle("1918-1957")+ theme(legend.position = "none", plot.title = element_text(hjust = 0.5),axis.text=element_blank(),axis.title=element_blank()) + ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.06))
 
-# Repeat for filtered_data_T4
 T4 <- ggplot(filtered_data_T4, aes(x = PC_LD1, y = PC_LD2, color = Country)) +
-  geom_point(aes(alpha = 0.2), size = 3) +  # Adjust alpha for "C" rows
-  scale_color_manual(values = colorBlindBlack8) +  # Apply dynamically generated palette
-  scale_fill_manual(values = colorBlindBlack8) +  # Match fill colors for ellipses
-  scale_alpha_identity() +  # Use the alpha values directly
+  geom_point(aes(alpha = 0.2), size = 3) +  
+  scale_color_manual(values = colorBlindBlack8) +  
+  scale_fill_manual(values = colorBlindBlack8) +  
+  scale_alpha_identity() +  
   theme_light() + ggtitle("1958-1997")+ theme(legend.position = "none", plot.title = element_text(hjust = 0.5),axis.text=element_blank(),axis.title=element_blank()) + ylim(c(-0.05, 0.08)) + xlim(c(-0.04,0.06))
 
 panelB <- ggarrange(T1,T2,T3,T4,ncol=2,nrow=2)
-# Arrange the plots
+
 combined_plot <- ggarrange(
     Ttotal, 
-    panelB, # The total plot
+    panelB, 
     ncol=2,
-nrow = 1,  # Two rows: one for Ttotal, one for T1-T4
-    heights = c(1, 1),legend="top"  # Make Ttotal twice the height of the row with T1-T4
+nrow = 1,  
+    heights = c(1, 1),legend="top" 
 )
 
-# Display the combined plot
 print(combined_plot)
-
-
-
 
 herb_df <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv",header=TRUE)
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1838-1877" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_1 <- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -142,26 +123,21 @@ results_N_1 <- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1878-1917" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_2<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -174,26 +150,21 @@ results_N_2<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1918-1957" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_3<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -206,26 +177,21 @@ results_N_3<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="North" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1958-1997" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_N_4<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -238,26 +204,21 @@ results_N_4<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1838-1877" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_1 <- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -270,26 +231,21 @@ results_S_1 <- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1878-1917" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_2<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -302,26 +258,21 @@ results_S_2<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1918-1957" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_3<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -334,26 +285,21 @@ results_S_3<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="South" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1958-1997" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_S_4<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -366,26 +312,21 @@ results_S_4<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1838-1877" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_M_1 <- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -398,26 +339,21 @@ results_M_1 <- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1878-1917" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_M_2<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -430,26 +366,21 @@ results_M_2<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1918-1957" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_M_3<- centroids %>%
     rowwise() %>%
     dplyr::mutate(
@@ -462,26 +393,21 @@ results_M_3<- centroids %>%
     dplyr::select(Country, avg_distance, sd_distance)
 
 pc_cols <- c("PC_LD1","PC_LD2")
-# Assume your data frame is called df and has columns: Country, PC_LD1, PC_LD2, PC3, ...
 df <- herb_df[herb_df$Region=="Middle" | herb_df$H_C=="C",]
 df <- df[df$TimeBin=="1958-1997" | df$H_C=="C",]
 library(dplyr)
 
-# Calculate centroids for each country except USA
 centroids <- df %>%
     filter(Country != "USA") %>%
     group_by(Country) %>%
     dplyr::summarise(across(all_of(pc_cols), mean), .groups = "drop")
 
-# Get USA samples
 usa_samples <- df %>%
     filter(Country == "USA") %>%
     dplyr::select(all_of(pc_cols))
 
-# Function to calculate Euclidean distance
 euclidean <- function(a, b) sqrt(sum((a - b)^2))
 
-# For each centroid, calculate distances to all USA samples
 results_M_4<- centroids %>%
     rowwise() %>%
     dplyr::mutate(

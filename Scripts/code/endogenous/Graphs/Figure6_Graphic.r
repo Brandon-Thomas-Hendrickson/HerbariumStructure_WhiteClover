@@ -1,11 +1,3 @@
-##########################
-#Figure 5: Selection Graphic
-############################
-
-####################
-#AC LI Plotting ####
-####################
-
 library(ggplot2)
 
 op <- read.csv("Data/herbarium/Input/herbarium_structure_dataframe_1192026.csv",header=TRUE)
@@ -15,7 +7,6 @@ op_N <- op[op$Region=="North",]
 
 ac_model <- lm(stdAC ~ Year, data = op_N)
 summary(ac_model)
-# Create a new data frame for predictions
 prediction_data_N <- data.frame(
   Year = seq(min(op_N$Year, na.rm = TRUE), max(op_N$Year, na.rm = TRUE), length.out = 100)
 )
@@ -26,30 +17,25 @@ op_S <- op[op$Region=="South",]
 
 ac_model <- lm(stdAC ~ Year, data = op_S)
 summary(ac_model)
-# Create a new data frame for predictions
 prediction_data_S <- data.frame(
   Year = seq(min(op_S$Year, na.rm = TRUE), max(op_S$Year, na.rm = TRUE), length.out = 100)
 )
-# Generate predictions
 prediction_data_S$Predicted_stdAC <- predict(ac_model, newdata = prediction_data_S)
 
 op_M <- op[op$Region=="Middle",]
 
 ac_model <- lm(stdAC ~ Year, data = op_M)
 summary(ac_model)
-# Create a new data frame for predictions
 prediction_data_M <- data.frame(
   Year = seq(min(op_M$Year, na.rm = TRUE), max(op_M$Year, na.rm = TRUE), length.out = 100)
 )
-# Generate predictions
 prediction_data_M$Predicted_stdAC <- predict(ac_model, newdata = prediction_data_M)
 
 ac_model <- lm(stdAC ~ Year * lat, data = op)
-# Create a new data frame for predictions
 summary(ac_model)
 prediction_data <- data.frame(
   Year = seq(min(op$Year, na.rm = TRUE), max(op$Year, na.rm = TRUE), length.out = 100),
-  lat = mean(op$lat, na.rm = TRUE)  # Use the mean lat or adjust as needed
+  lat = mean(op$lat, na.rm = TRUE) 
 )
 
 prediction_data$Predicted_stdAC <- predict(ac_model, newdata = prediction_data)
@@ -81,24 +67,20 @@ plot_NS_AC <- ggplot(data = op, aes(x = Year, y = stdAC)) +
     axis.text    = element_text(size = 12, color = "black"),
     axis.title.y = element_text(size = 12, color = "black")
   )
-# Fit the linear regression model
+
 li_model <- lm(stdLI ~ Year * lat, data = op)
 
-# Summary of the model
 summary(li_model)
 
-# Create a new data frame for predictions
 prediction_data <- data.frame(
     Year = seq(min(op$Year, na.rm = TRUE), max(op$Year, na.rm = TRUE), length.out = 100),
-    lat = mean(op$lat, na.rm = TRUE)  # Use the mean lat or adjust as needed
+    lat = mean(op$lat, na.rm = TRUE) 
 )
 
-# Generate predicted values
 prediction_data$Predicted_stdLI <- predict(li_model, newdata = prediction_data)
 
 
 op_N <- op[op$Region=="North",]
-# Create a new data frame for predictions
 
 li_model <- lm(stdLI ~ Year, data = op_N)
 summary(li_model)
@@ -112,15 +94,12 @@ op_S <- op[op$Region=="South",]
 
 li_model <- lm(stdLI ~ Year, data = op_S)
 summary(li_model)
-# Create a new data frame for predictions
 prediction_data_S <- data.frame(
   Year = seq(min(op_S$Year, na.rm = TRUE), max(op_S$Year, na.rm = TRUE), length.out = 100)
 )
-# Generate predictions
 prediction_data_S$Predicted_stdLI <- predict(li_model, newdata = prediction_data_S)
 
 op_M <- op[op$Region=="Middle",]
-# Create a new data frame for predictions
 
 li_model <- lm(stdLI ~ Year, data = op_M)
 summary(li_model)
@@ -158,15 +137,6 @@ plot_NS_LI <- ggplot(data = op, aes(x = Year, y = stdLI)) +
     axis.title.y = element_text(size = 12, color = "black")
   )
 
-##########################
-#Figure 5: Selection Graphic
-############################
-
-####################
-#AC LI Plotting ####
-####################
-
-
 final_figure <- ggarrange(plot_NS_AC,plot_NS_LI,ncol=2,nrow=1,labels=c("A","B"))
 
 ggsave("Figure5.pdf", plot = final_figure, width = 8, height = 4, units = "in")
@@ -176,12 +146,8 @@ op <- op[,c("stdAC","stdLI","Year","Region","Samp","lat","lon")]
 library(dplyr)
 library(broom)
 
-# Initialize list to store model results
 model_results <- list()
 
-# ========== AC MODELS ==========
-
-# Model 1: AC ~ Year (North)
 op_N <- op[op$Region == "North", ]
 ac_model_N <- lm(stdAC ~ Year, data = op_N)
 
@@ -191,7 +157,6 @@ model_results[["AC_North_Year"]] <- tidy(ac_model_N) %>%
          Predictors = "Year",
          Region = "North")
 
-# Model 2: AC ~ Year (South)
 op_S <- op[op$Region == "South", ]
 ac_model_S <- lm(stdAC ~ Year, data = op_S)
 
@@ -201,7 +166,6 @@ model_results[["AC_South_Year"]] <- tidy(ac_model_S) %>%
          Predictors = "Year",
          Region = "South")
 
-# Model 3: AC ~ Year * lat (All)
 ac_model_all <- lm(stdAC ~ Year * lat, data = op)
 
 model_results[["AC_All_Year_lat"]] <- tidy(ac_model_all) %>%
@@ -210,9 +174,6 @@ model_results[["AC_All_Year_lat"]] <- tidy(ac_model_all) %>%
          Predictors = "Year * lat",
          Region = "All")
 
-# ========== LI MODELS ==========
-
-# Model 4: LI ~ Year * lat (All)
 li_model_all <- lm(stdLI ~ Year * lat, data = op)
 
 model_results[["LI_All_Year_lat"]] <- tidy(li_model_all) %>%
@@ -221,7 +182,6 @@ model_results[["LI_All_Year_lat"]] <- tidy(li_model_all) %>%
          Predictors = "Year * lat",
          Region = "All")
 
-# Model 5: LI ~ Year (North)
 li_model_N <- lm(stdLI ~ Year, data = op_N)
 
 model_results[["LI_North_Year"]] <- tidy(li_model_N) %>%
@@ -230,7 +190,6 @@ model_results[["LI_North_Year"]] <- tidy(li_model_N) %>%
          Predictors = "Year",
          Region = "North")
 
-# Model 6: LI ~ Year (South)
 li_model_S <- lm(stdLI ~ Year, data = op_S)
 
 model_results[["LI_South_Year"]] <- tidy(li_model_S) %>%
@@ -239,14 +198,12 @@ model_results[["LI_South_Year"]] <- tidy(li_model_S) %>%
          Predictors = "Year",
          Region = "South")
 
-# ========== COMBINE ALL MODEL RESULTS ==========
 all_model_results <- bind_rows(model_results)
 
 # Reorder columns for clarity
 all_model_results <- all_model_results %>%
   dplyr::select(Model, Response, Region, Predictors, term, estimate, std.error, statistic, p.value)
 
-# ========== EXTRACT MODEL FIT STATISTICS ==========
 model_fit <- data.frame(
   Model = c("AC_North_Year", "AC_South_Year", "AC_All_Year_lat", 
             "LI_All_Year_lat", "LI_North_Year", "LI_South_Year"),
@@ -277,6 +234,4 @@ model_fit <- data.frame(
             nobs(li_model_all), nobs(li_model_N), nobs(li_model_S))
 )
 
-# ========== VIEW RESULTS ==========
-print("Model Coefficients:")
 print(all_model_results)
